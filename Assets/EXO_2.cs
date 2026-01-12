@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 public class EXO_2 : MonoBehaviour
 {
     private Mesh mesh;
@@ -34,12 +35,23 @@ public class EXO_2 : MonoBehaviour
         return count;
     }
 
+    private float alpha(int n)
+    {
+        if (n == 3)
+            return 3 / 16;
+        else
+        {
+            return (5/8 - Mathf.Pow((3/8 + (MathF.Cos((2*MathF.PI)/n))/4),2)) / n;
+        }
+    }
+
     private void Loop()
     {
         Mesh mP = mesh;
         List<Vector3> newPoints = mesh.vertices.ToList();
         Vector3 p1, p2, p3, newP;
         List<int> currentVs = new List<int>();
+        //Etape 1
         for(int i = 0;i < mesh.triangles.Length; i += 3)
         {
             newPoints.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 1]));
@@ -47,6 +59,16 @@ public class EXO_2 : MonoBehaviour
             newPoints.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 2]));
             Debug.Log(newPoints.Count);
         }
+
+        //Etape 2
+        int valence;
+        float alpha;
+        for (int i = 0; i < mesh.vertices.Length; i++) 
+        {
+            valence = this.valence(i);
+            alpha = this.alpha(valence);
+        }
+
     }
 
     private List<int> getVL_VR(int i1, int i2)
