@@ -5,6 +5,9 @@ using System;
 public class EXO_2 : MonoBehaviour
 {
     private Mesh mesh;
+    // Clé : index du point de base dans la mesh de base. Valeurs : index des nouveaux points 
+    Dictionary<int, List<int>> nouveauxPoints = new Dictionary<int, List<int>>();
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -63,10 +66,19 @@ public class EXO_2 : MonoBehaviour
         //Etape 2
         int valence;
         float alpha;
+        float sommeV;
+        Vector3 newPoint;
         for (int i = 0; i < mesh.vertices.Length; i++) 
         {
             valence = this.valence(i);
             alpha = this.alpha(valence);
+            newPoint = (1 - valence * alpha) * mesh.vertices[i] ;
+            sommeV = getSommeVoisins(i);
+            newPoint.x += alpha * getSommeVoisins(i);
+            newPoint.y += alpha * getSommeVoisins(i);
+            newPoint.z += alpha * getSommeVoisins(i);
+            newPoints.Add(newPoint);    
+
         }
 
     }
@@ -142,6 +154,47 @@ public class EXO_2 : MonoBehaviour
 
 
 
+    }
+
+    float getSommeVoisins(int index) 
+    { 
+        List<int> voisins = new List<int>();
+        float somme = 0;
+        for(int i = 0; i < mesh.triangles.Length; i += 3)
+        {
+            if (mesh.triangles[i] == index)
+            {
+                if(!voisins.Contains(mesh.triangles[i+1])) voisins.Add(mesh.triangles[i+1]);
+                if (!voisins.Contains(mesh.triangles[i + 2])) voisins.Add(mesh.triangles[i + 2]);
+            }
+            else if (mesh.triangles[i+1] == index)
+            {
+                if (!voisins.Contains(mesh.triangles[i ])) voisins.Add(mesh.triangles[i ]);
+                if (!voisins.Contains(mesh.triangles[i + 2])) voisins.Add(mesh.triangles[i + 2]);
+            }
+            else if (mesh.triangles[i + 2] == index)
+            {
+                if (!voisins.Contains(mesh.triangles[i + 1])) voisins.Add(mesh.triangles[i + 1]);
+                if (!voisins.Contains(mesh.triangles[i ])) voisins.Add(mesh.triangles[i ]);
+            }
+        }
+
+        foreach (int ind in voisins) 
+        {
+            somme += alpha(valence(ind));
+        }
+        return somme;
+    }
+
+    List<Vector3> nouveauxSommets(int i)
+    {
+        List<Vector3> output = new List<Vector3>();
+
+        output.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 1]));
+        output.Add(createNewPoint(mesh.triangles[i + 1], mesh.triangles[i + 2]));
+        output.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 2]));
+
+        return output;  
     }
 
    
