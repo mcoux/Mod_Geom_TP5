@@ -16,7 +16,7 @@ public class EXO_2 : MonoBehaviour
         // foreach (Vector3 p in mesh.vertices) Debug.Log(p);
         Debug.Log(mesh.vertices.Length);
         Debug.Log(valence(0));
-       Loop();
+        Loop();
     }
 
     // Update is called once per frame
@@ -80,6 +80,7 @@ public class EXO_2 : MonoBehaviour
             newPoints.Add(newPoint);    
 
         }
+
 
     }
 
