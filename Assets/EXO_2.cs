@@ -106,7 +106,7 @@ public class EXO_2 : MonoBehaviour
 
             //Face 1
             newFaces.Add(x1);
-            newFaces.Add(x2x3);
+            newFaces.Add(x1x2);
             newFaces.Add(x3x1);
 
             //Face 2
@@ -246,7 +246,7 @@ public class EXO_2 : MonoBehaviour
         return output;  
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         foreach (Vector3 point in newVertrices)
         {
