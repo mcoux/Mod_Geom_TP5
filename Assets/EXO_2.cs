@@ -5,8 +5,12 @@ using System;
 public class EXO_2 : MonoBehaviour
 {
     private Mesh mesh;
+    private List<Vector3> newVertrices = new List<Vector3>();
+
     // Clé : index du point de base dans la mesh de base. Valeurs : index des nouveaux points 
-    Dictionary<int, List<int>> nouveauxPoints = new Dictionary<int, List<int>>();
+    Dictionary<(int,int), int> pointsParArete = new Dictionary<(int,int), int>();
+    //Clé ; index du point dans la forme de base. Valeur : index du point dans la nouvelle mesh
+    Dictionary<int,int> majPoints = new Dictionary<int,int>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -57,9 +61,15 @@ public class EXO_2 : MonoBehaviour
         //Etape 1
         for(int i = 0;i < mesh.triangles.Length; i += 3)
         {
+            //On ajoute le point de chaque arête dans un dictionnaire qui sera réutilisé pour la partie 3
             newPoints.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 1]));
+            pointsParArete.Add((mesh.triangles[i], mesh.triangles[i + 1]), newPoints.Count - 1);
+
             newPoints.Add(createNewPoint(mesh.triangles[i+1], mesh.triangles[i +2]));
-            newPoints.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 2]));
+            pointsParArete.Add((mesh.triangles[i+1], mesh.triangles[i + 2]), newPoints.Count - 1);
+
+            newPoints.Add(createNewPoint(mesh.triangles[i+2], mesh.triangles[i]));
+            pointsParArete.Add((mesh.triangles[i + 2], mesh.triangles[i]), newPoints.Count - 1);
             Debug.Log(newPoints.Count);
         }
 
@@ -78,10 +88,48 @@ public class EXO_2 : MonoBehaviour
             newPoint.y += alpha * getSommeVoisins(i);
             newPoint.z += alpha * getSommeVoisins(i);
             newPoints.Add(newPoint);    
-
+            majPoints.Add(i,newPoints.Count - 1);
         }
 
+        //Etape3
+        List<int> newFaces = new List<int>();
+        int x1,x2,x3, x1x2, x2x3, x3x1;
+        for (int i = 0; i < mesh.triangles.Length; i += 3)
+        {
+            x1 = majPoints[mesh.triangles[i]];
+            x2 = majPoints[mesh.triangles[i + 1]];
+            x3 = majPoints[mesh.triangles[i +2]];
 
+            x1x2 = pointsParArete[(mesh.triangles[i], mesh.triangles[i + 1])];
+            x2x3 = pointsParArete[(mesh.triangles[i+1], mesh.triangles[i + 2])];
+            x3x1 = pointsParArete[(mesh.triangles[i + 2], mesh.triangles[i])];
+
+            //Face 1
+            newFaces.Add(x1);
+            newFaces.Add(x2x3);
+            newFaces.Add(x3x1);
+
+            //Face 2
+            newFaces.Add(x2);
+            newFaces.Add(x2x3);
+            newFaces.Add(x1x2);
+
+            //Face 3
+            newFaces.Add(x3);
+            newFaces.Add(x3x1);
+            newFaces.Add(x2x3);
+
+            //Face 4
+            newFaces.Add(x1x2);
+            newFaces.Add(x2x3);
+            newFaces.Add(x3x1);
+
+        }
+        newVertrices = newPoints;
+
+        mesh.vertices = newPoints.ToArray();
+        mesh.triangles = newFaces.ToArray();
+        mesh.RecalculateBounds();
     }
 
     private List<int> getVL_VR(int i1, int i2)
@@ -198,5 +246,11 @@ public class EXO_2 : MonoBehaviour
         return output;  
     }
 
-   
+    private void OnDrawGizmos()
+    {
+        foreach (Vector3 point in newVertrices)
+        {
+            Gizmos.DrawIcon(point + transform.position, "e");
+        }
+    }
 }
