@@ -19,8 +19,9 @@ public class EXO_2 : MonoBehaviour
         createMesh();
         // foreach (Vector3 p in mesh.vertices) Debug.Log(p);
         Debug.Log(mesh.vertices.Length);
-        Debug.Log(valence(0));
         Loop();
+
+
     }
 
     // Update is called once per frame
@@ -235,16 +236,7 @@ public class EXO_2 : MonoBehaviour
         return somme;
     }
 
-    List<Vector3> nouveauxSommets(int i)
-    {
-        List<Vector3> output = new List<Vector3>();
 
-        output.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 1]));
-        output.Add(createNewPoint(mesh.triangles[i + 1], mesh.triangles[i + 2]));
-        output.Add(createNewPoint(mesh.triangles[i], mesh.triangles[i + 2]));
-
-        return output;  
-    }
 
     private void OnDrawGizmosSelected()
     {
